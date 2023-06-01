@@ -5,12 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 
+use function Ramsey\Uuid\v1;
+
 class CategoryController extends Controller
 {
     public function index()
     {
         $categories = Category::all();
         return response()->json($categories);
+    }
+
+
+    public function category()
+    {
+        $categories = Category::all();
+    
+        return view('category', ['categories' => $categories]);
     }
 
     public function show($id)

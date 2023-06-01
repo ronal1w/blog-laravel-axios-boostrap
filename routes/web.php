@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\CategoryController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -48,6 +48,9 @@ Route::get('crear-categorias', function () {
 Route::get('editar-categoria/{id}', function () {
     return view('editar-categoria');
 });
+
+Route::get('/category', [CategoryController::class, 'category']);
+
 
 Auth::routes();
 
