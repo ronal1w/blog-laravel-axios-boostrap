@@ -45,6 +45,10 @@ Route::get('crear-categorias', function () {
     return view('crear-categoria');
 });
 
+Route::get('editar-categoria/{id}', function () {
+    return view('editar-categoria');
+});
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

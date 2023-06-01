@@ -13,6 +13,12 @@ class CategoryController extends Controller
         return response()->json($categories);
     }
 
+    public function show($id)
+    {
+        $categories = Category::find($id);
+        return response()->json($categories);
+    }
+
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -58,7 +64,17 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
+        // Eliminar la imagen de la categoría si existe
+        if ($category->image) {
+            $imagePath = public_path('images/' . $category->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+    
         $category->delete();
+    
         return response()->json(null, 204);
     }
+    
 }

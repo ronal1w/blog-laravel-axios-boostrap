@@ -32,6 +32,16 @@
     </div>
 </div>
 
+<style>
+    .horizontal-buttons {
+        display: flex;
+    }
+
+    .horizontal-buttons button {
+        margin-right: 5px;
+    }
+</style>
+
 <script>
     // Función para eliminar una categoría
     function deleteCategory(categoryId) {
@@ -54,6 +64,11 @@
         }
     }
 
+    // Función para redirigir a la página de edición de una categoría
+    function editCategory(categoryId) {
+        window.location.href = 'http://127.0.0.1:8000/editar-categoria/' + categoryId;
+    }
+
     axios.get('http://127.0.0.1:8000/api/categories')
         .then(function (response) {
             // Handle the API response
@@ -71,8 +86,9 @@
                     <td>${category.image ? '<img src="/images/' + category.image + '" alt="Image" style="max-width: 100px;">' : ''}</td>
                     <td>${category.created_at}</td>
                     <td>${category.updated_at}</td>
-                    <td>
+                    <td class="horizontal-buttons">
                         <button class="btn btn-danger btn-sm" onclick="deleteCategory(${category.id})">Delete</button>
+                        <button class="btn btn-primary btn-sm" onclick="editCategory(${category.id})">Edit</button>
                     </td>
                 `;
                 categoriesList.appendChild(row);
