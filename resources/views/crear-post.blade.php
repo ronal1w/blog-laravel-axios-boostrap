@@ -58,10 +58,6 @@
                         // Initial loading of categories
                         getCategories();
                     </script>
-
-
-
-
                 </div>
             </div>
         </div>

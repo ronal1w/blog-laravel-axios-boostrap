@@ -41,6 +41,10 @@ Route::get('categorias', function () {
     return view('categoria');
 });
 
+Route::get('crear-categorias', function () {
+    return view('crear-categoria');
+});
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
