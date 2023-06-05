@@ -3,25 +3,39 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">{{ __('Dashboard') }}</div>
 
                 <div class="card-body">
                     <div class="container">
-                        <h1>Post Details</h1>
+                        <h1>Detalles del Post</h1>
                         <div id="postDetails" class="card">
                             <div class="card-body">
                                 <h5 id="postTitle" class="card-title"></h5>
-                                <p id="postContent" class="card-text"></p>
                                 <img id="postImage" class="img-fluid" alt="">
-                                <p id="postCategory" class="card-text"></p>
-                                <p id="postUser" class="card-text"></p>
+                                <p id="postContent" class="card-text"></p>
+
+                                <h2>Usuario</h2>
+                                <p id="userName" class="card-text"></p>
+                                <p id="userEmail" class="card-text"></p>
+
+                                <h2>Categoría</h2>
+                                <p id="categoryName" class="card-text"></p>
+                                <img id="categoryImage" class="img-fluid" alt="">
+
+                                <h2>Comentarios</h2>
+                                <ul id="commentList" class="list-group"></ul>
+
+                                <h2>Agregar Comentario</h2>
+                                <form id="commentForm">
+                                    <div class="form-group">
+                                        <textarea class="form-control" id="commentContent" rows="3" placeholder="Escribe tu comentario"></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Agregar</button>
+                                </form>
                             </div>
                         </div>
-                
-                        <h2>Comments</h2>
-                        <ul id="commentList" class="list-group"></ul>
                     </div>
                 </div>
             </div>
@@ -34,55 +48,82 @@
 <script>
     const postId = window.location.pathname.split('/').pop();
 
-    // Obtener los detalles del post
-    axios.get(`/api/posts/${postId}`)
-        .then(response => {
-            const post = response.data;
+    // Obtener los detalles del post y los comentarios
+    const getPostDetails = () => {
+        axios.get(`/api/posts/${postId}`)
+            .then(response => {
+                const post = response.data;
 
-            // Actualizar los elementos HTML con los datos del post
-            const postTitleElement = document.getElementById('postTitle');
-            postTitleElement.textContent = post.title;
+                // Actualizar los elementos HTML con los datos del post
+                const postTitleElement = document.getElementById('postTitle');
+                postTitleElement.textContent = post.title;
 
-            const postContentElement = document.getElementById('postContent');
-            postContentElement.textContent = post.content;
+                const postImageElement = document.getElementById('postImage');
+                postImageElement.src = '/images/' + post.img;
+                postImageElement.alt = post.title;
 
-            const postImageElement = document.getElementById('postImage');
-            postImageElement.src = '/images/' + post.img;
-            postImageElement.alt = post.title;
+                const postContentElement = document.getElementById('postContent');
+                postContentElement.textContent = post.content;
 
-            const postCategoryElement = document.getElementById('postCategory');
-            postCategoryElement.textContent = 'Category: ' + post.category.name;
+                const userNameElement = document.getElementById('userName');
+                userNameElement.textContent = 'Nombre: ' + post.user.name;
 
-            const postUserElement = document.getElementById('postUser');
-            postUserElement.textContent = 'Created by: ' + post.user.name;
-        })
-        .catch(error => {
-            console.error(error);
-        });
+                const userEmailElement = document.getElementById('userEmail');
+                userEmailElement.textContent = 'Correo electrónico: ' + post.user.email;
 
-    // Obtener los comentarios del post
-    axios.get(`/api/posts/${postId}/comments`)
-        .then(response => {
-            const comments = response.data;
+                const categoryNameElement = document.getElementById('categoryName');
+                categoryNameElement.textContent = 'Nombre: ' + post.category.name;
 
-            // Obtener el elemento de la lista de comentarios
-            const commentListElement = document.getElementById('commentList');
+                const categoryImageElement = document.getElementById('categoryImage');
+                categoryImageElement.src = '/images/' + post.category.image;
+                categoryImageElement.alt = post.category.name;
 
-            // Limpiar la lista de comentarios
-            commentListElement.innerHTML = '';
+                const commentListElement = document.getElementById('commentList');
 
-            // Iterar sobre los comentarios y crear elementos HTML para cada uno
-            comments.forEach(comment => {
-                const commentItem = document.createElement('li');
-                commentItem.className = 'list-group-item';
-                commentItem.textContent = 'Comment: ' + comment.content;
+                // Limpiar la lista de comentarios
+                commentListElement.innerHTML = '';
 
-                commentListElement.appendChild(commentItem);
+                post.comments.forEach(comment => {
+                    const commentItem = document.createElement('li');
+                    commentItem.className = 'list-group-item';
+                    commentItem.textContent = 'Contenido: ' + comment.content;
+
+                    commentListElement.appendChild(commentItem);
+                });
+            })
+            .catch(error => {
+                console.error(error);
             });
+    };
+
+    // Enviar el nuevo comentario
+    const submitComment = (event) => {
+        event.preventDefault();
+
+        const commentContent = document.getElementById('commentContent').value;
+
+        axios.post('/api/comments', {
+        content: commentContent,
+        user_id: {{ Auth::id() }}, // Obtener el ID del usuario de la sesión actual
+        post_id: postId // Obtener el ID del post de la ruta
+    })
+        .then(response => {
+            // Limpiar el campo de comentario
+            document.getElementById('commentContent').value = '';
+
+            // Volver a obtener los detalles del post y los comentarios para mostrar la lista actualizada
+            getPostDetails();
         })
         .catch(error => {
             console.error(error);
         });
+    };
+
+    // Escuchar el evento de envío del formulario de comentario
+    document.getElementById('commentForm').addEventListener('submit', submitComment);
+
+    // Obtener los detalles del post al cargar la página
+    getPostDetails();
 </script>
 
 @endsection
